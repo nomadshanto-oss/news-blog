@@ -8,18 +8,21 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 BLOG_ID = os.environ.get("BLOG_ID")
 ACCESS_TOKEN = os.environ.get("BLOGGER_ACCESS_TOKEN")
 
-def generate_blog_content():
+def generate_multiple_blog_posts():
     client = genai.Client(api_key=GEMINI_API_KEY)
     
-    # মার্কিন যুক্তরাষ্ট্রের ট্রেন্ডিং বা আলোচিত বিষয় নিয়ে লেখার প্রম্পট
+    # একসাথে ৩টি ভিন্ন ট্রেন্ডিং মার্কিন খবরের পোস্ট লেখার প্রম্পট (সম্পূর্ণ ইংরেজিতে)
     prompt = """
-    Act as a professional news journalist. Pick a major trending topic or news story currently relevant in the United States (such as politics, tech trends, or major current events). 
-    Write an engaging, natural, human-like news blog post in Bengali based on it.
-    Avoid overly robotic transitions. 
-    Format requirements:
-    - The first line must be a catchy news Title in Bengali.
+    Act as a professional US news journalist. Pick 3 distinct major trending topics or news stories currently relevant in the United States (such as US politics, tech trends, economy, or major current events).
+    Write 3 separate engaging, natural, human-like news blog posts in English.
+    
+    Strictly separate each post using the exact delimiter: '---POST_SEPARATOR---'
+    
+    Format requirements for each post:
+    - The first line of each post must be a catchy news Title in English.
     - Provide a relevant image URL using a standard HTML img tag right under the title that fits a modern news article.
     - Followed by well-structured HTML content using h2 and p tags.
+    - Absolutely NO Bengali text. Everything must be in English.
     """
     
     response = client.models.generate_content(
@@ -28,12 +31,17 @@ def generate_blog_content():
     )
     
     text = response.text.strip()
-    lines = text.split('\n')
+    raw_posts = text.split('---POST_SEPARATOR---')
     
-    title = lines[0].replace('#', '').replace('Title:', '').strip() if lines else "US News Update"
-    content = "\n".join(lines[1:]).strip() if len(lines) > 1 else text
-    
-    return title, content
+    posts = []
+    for raw in raw_posts:
+        lines = [line.strip() for line in raw.strip().split('\n') if line.strip()]
+        if lines:
+            title = lines[0].replace('#', '').replace('Title:', '').strip()
+            content = "\n".join(lines[1:]).strip()
+            posts.append((title, content))
+            
+    return posts
 
 def post_to_blogger(title, content):
     credentials = Credentials(token=ACCESS_TOKEN)
@@ -50,8 +58,10 @@ def post_to_blogger(title, content):
     print(f"Blog post created successfully! URL: {response.get('url')}")
 
 if __name__ == "__main__":
-    print("Generating US trending news content using Gemini AI...")
-    title, content = generate_blog_content()
+    print("Generating multiple English US news posts using Gemini AI...")
+    posts = generate_multiple_blog_posts()
     
-    print(f"Posting to Blogger... Title: {title}")
-    post_to_blogger(title, content)
+    for title, content in posts:
+        if title and content:
+            print(f"Posting to Blogger... Title: {title}")
+            post_to_blogger(title, content)
