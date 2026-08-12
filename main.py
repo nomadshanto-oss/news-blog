@@ -9,14 +9,13 @@ BLOG_ID = os.environ.get("BLOG_ID")
 ACCESS_TOKEN = os.environ.get("BLOGGER_ACCESS_TOKEN")
 
 def generate_blog_content():
-    # নতুন google-genai ক্লায়েন্ট ইনিশিয়ালাইজ করা
+    # নতুন লাইব্রেরির জন্য সচল মডেল নাম gemini-1.5-flash ব্যবহার করা হয়েছে
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     prompt = "Write an engaging, natural, human-like blog post about the latest technology trends and AI automation in Bengali. Avoid overly robotic transitions. The first line must be the title, followed by HTML formatted content using h2 and p tags."
     
-    # জেমিনি মডেল থেকে রেসপন্স জেনারেট করা
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-1.5-flash',
         contents=prompt,
     )
     
