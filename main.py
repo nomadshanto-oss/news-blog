@@ -12,7 +12,8 @@ ACCESS_TOKEN = os.environ.get("BLOGGER_ACCESS_TOKEN")
 genai.configure(api_key=GEMINI_API_KEY)
 
 def generate_blog_content():
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    # এখানে মডেল নাম পরিবর্তন করে gemini-1.5-flash দেওয়া হয়েছে যা বর্তমানে সম্পূর্ণ সচল
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     prompt = "Write an engaging, natural, human-like blog post about the latest technology trends and AI automation in Bengali. Avoid overly robotic transitions. The first line must be the title, followed by HTML formatted content using h2 and p tags."
     
