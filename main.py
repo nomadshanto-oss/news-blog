@@ -1,5 +1,5 @@
 import os
-import google.generativeai as genai
+from google import genai
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 
@@ -8,16 +8,18 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 BLOG_ID = os.environ.get("BLOG_ID")
 ACCESS_TOKEN = os.environ.get("BLOGGER_ACCESS_TOKEN")
 
-# জেমিনি এআই কনফিগারেশন
-genai.configure(api_key=GEMINI_API_KEY)
-
 def generate_blog_content():
-    # এখানে মডেল নাম পরিবর্তন করে gemini-1.5-flash দেওয়া হয়েছে যা বর্তমানে সম্পূর্ণ সচল
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # নতুন google-genai ক্লায়েন্ট ইনিশিয়ালাইজ করা
+    client = genai.Client(api_key=GEMINI_API_KEY)
     
     prompt = "Write an engaging, natural, human-like blog post about the latest technology trends and AI automation in Bengali. Avoid overly robotic transitions. The first line must be the title, followed by HTML formatted content using h2 and p tags."
     
-    response = model.generate_content(prompt)
+    # জেমিনি মডেল থেকে রেসপন্স জেনারেট করা
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=prompt,
+    )
+    
     text = response.text.strip()
     
     lines = text.split('\n')
