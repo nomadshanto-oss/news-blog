@@ -9,20 +9,28 @@ BLOG_ID = os.environ.get("BLOG_ID")
 ACCESS_TOKEN = os.environ.get("BLOGGER_ACCESS_TOKEN")
 
 def generate_blog_content():
-    # লেটেস্ট স্ট্যাবল মডেল gemini-3.5-flash ব্যবহার করা হয়েছে
     client = genai.Client(api_key=GEMINI_API_KEY)
     
-    prompt = "Write an engaging, natural, human-like blog post about the latest technology trends and AI automation in Bengali. Avoid overly robotic transitions. The first line must be the title, followed by HTML formatted content using h2 and p tags."
+    # মার্কিন যুক্তরাষ্ট্রের ট্রেন্ডিং বা আলোচিত বিষয় নিয়ে লেখার প্রম্পট
+    prompt = """
+    Act as a professional news journalist. Pick a major trending topic or news story currently relevant in the United States (such as politics, tech trends, or major current events). 
+    Write an engaging, natural, human-like news blog post in Bengali based on it.
+    Avoid overly robotic transitions. 
+    Format requirements:
+    - The first line must be a catchy news Title in Bengali.
+    - Provide a relevant image URL using a standard HTML img tag right under the title that fits a modern news article.
+    - Followed by well-structured HTML content using h2 and p tags.
+    """
     
     response = client.models.generate_content(
-        model='gemini-3.5-flash',
+        model='gemini-2.5-flash',
         contents=prompt,
     )
     
     text = response.text.strip()
-    
     lines = text.split('\n')
-    title = lines[0].replace('#', '').replace('Title:', '').strip() if lines else "Tech Update"
+    
+    title = lines[0].replace('#', '').replace('Title:', '').strip() if lines else "US News Update"
     content = "\n".join(lines[1:]).strip() if len(lines) > 1 else text
     
     return title, content
@@ -42,7 +50,7 @@ def post_to_blogger(title, content):
     print(f"Blog post created successfully! URL: {response.get('url')}")
 
 if __name__ == "__main__":
-    print("Generating content using Gemini AI...")
+    print("Generating US trending news content using Gemini AI...")
     title, content = generate_blog_content()
     
     print(f"Posting to Blogger... Title: {title}")
