@@ -11,7 +11,7 @@ ACCESS_TOKEN = os.environ.get("BLOGGER_ACCESS_TOKEN")
 def generate_multiple_blog_posts():
     client = genai.Client(api_key=GEMINI_API_KEY)
     
-    # একসাথে ৩টি ভিন্ন ট্রেন্ডিং মার্কিন খবরের পোস্ট লেখার প্রম্পট (সম্পূর্ণ ইংরেজিতে)
+    # লেটেস্ট gemini-3.5-flash মডেল ব্যবহার করে একসাথে ৩টি ইংরেজি নিউজ পোস্ট তৈরির প্রম্পট
     prompt = """
     Act as a professional US news journalist. Pick 3 distinct major trending topics or news stories currently relevant in the United States (such as US politics, tech trends, economy, or major current events).
     Write 3 separate engaging, natural, human-like news blog posts in English.
@@ -26,7 +26,7 @@ def generate_multiple_blog_posts():
     """
     
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-3.5-flash',
         contents=prompt,
     )
     
@@ -58,7 +58,7 @@ def post_to_blogger(title, content):
     print(f"Blog post created successfully! URL: {response.get('url')}")
 
 if __name__ == "__main__":
-    print("Generating multiple English US news posts using Gemini AI...")
+    print("Generating multiple English US news posts using Gemini 3.5 Flash...")
     posts = generate_multiple_blog_posts()
     
     for title, content in posts:
