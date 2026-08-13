@@ -6,12 +6,16 @@ from google.oauth2.credentials import Credentials
 # এনভায়রনমেন্ট ভ্যারিয়েবল থেকে সিক্রেটগুলো লোড করা
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 BLOG_ID = os.environ.get("BLOG_ID")
+
+# ব্লগার অথেন্টিকেশনের জন্য প্রয়োজনীয় ভ্যারিয়েবল
 ACCESS_TOKEN = os.environ.get("BLOGGER_ACCESS_TOKEN")
+REFRESH_TOKEN = os.environ.get("BLOGGER_REFRESH_TOKEN")
+CLIENT_ID = os.environ.get("BLOGGER_CLIENT_ID")
+CLIENT_SECRET = os.environ.get("BLOGGER_CLIENT_SECRET")
 
 def generate_multiple_blog_posts():
     client = genai.Client(api_key=GEMINI_API_KEY)
     
-    # লেটেস্ট gemini-3.5-flash মডেল ব্যবহার করে একসাথে ৩টি ইংরেজি নিউজ পোস্ট তৈরির প্রম্পট
     prompt = """
     Act as a professional US news journalist. Pick 3 distinct major trending topics or news stories currently relevant in the United States (such as US politics, tech trends, economy, or major current events).
     Write 3 separate engaging, natural, human-like news blog posts in English.
@@ -44,7 +48,15 @@ def generate_multiple_blog_posts():
     return posts
 
 def post_to_blogger(title, content):
-    credentials = Credentials(token=ACCESS_TOKEN)
+    # টোকেন রিনিউ করার জন্য প্রয়োজনীয় ফিল্ডসহ ক্রেডেনশিয়াল সেটআপ
+    credentials = Credentials(
+        token=ACCESS_TOKEN,
+        refresh_token=REFRESH_TOKEN,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET
+    )
+    
     service = build('blogger', 'v3', credentials=credentials)
     
     body = {
